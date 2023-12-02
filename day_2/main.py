@@ -9,8 +9,23 @@ class Game:
     red: int = 0
     green: int = 0
 
+    def power(self):
+        return self.blue * self.red * self.green
+
 
 def part_1():
+    games = find_min_cubes()
+    possible = filter(
+        lambda x: x.red <= 12 and x.green <= 13 and x.blue <= 14, games)
+    return sum(map(lambda x: x.id, possible))
+
+
+def part_2():
+    games = find_min_cubes()
+    sum_of_powers = sum(g.power() for g in games)
+    return sum_of_powers
+
+def find_min_cubes():
     with open('input') as f:
         lines = f.readlines()
     games = []
@@ -26,9 +41,9 @@ def part_1():
                 current_count = getattr(game, color)
                 if int(count) > current_count:
                     setattr(game, color, int(count))
-    possible = filter(
-        lambda x: x.red <= 12 and x.green <= 13 and x.blue <= 14, games)
-    return sum(map(lambda x: x.id, possible))
+    return games
+
 
 if __name__ == '__main__':
     print(part_1())
+    print(part_2())
