@@ -17,8 +17,27 @@ def part_1() -> int:
 
     races = zip(times, distances)
 
-    ways_to_win = dict()
+    ways_to_win = calculate_ways_to_win(races)
 
+    ways_to_win_product = prod(ways_to_win.values())
+    return ways_to_win_product
+
+
+def part_2() -> int:
+    with open('input') as f:
+        lines: list[str] = f.readlines()
+
+    times = int(lines.pop(0).strip().split(':')[1].replace(' ', ''))
+    distances = int(lines.pop(0).strip().split(':')[1].replace(' ', ''))
+    races = [(times, distances)]
+
+    ways_to_win = calculate_ways_to_win(races)[0]
+
+    return ways_to_win
+
+
+def calculate_ways_to_win(races):
+    ways_to_win = dict()
     for i, (time, distance) in enumerate(races):
         # plot as a function of time holding the button, moving the y-axis
         # down by the distance, then finding the x-interceptions.
@@ -29,10 +48,9 @@ def part_1() -> int:
         root_2 = (-time - discriminant ** 0.5) / -2
 
         ways_to_win[i] = floor(root_2) - ceil(root_1) + 1
-
-    ways_to_win_product = prod(ways_to_win.values())
-    return ways_to_win_product
+    return ways_to_win
 
 
 if __name__ == '__main__':
     print(part_1())
+    print(part_2())
