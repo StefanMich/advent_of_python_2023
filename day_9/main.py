@@ -24,22 +24,44 @@ class Report:
             previous_line = temp
             all_zeros = all(number == 0 for number in temp)
 
-    def extrapolate_values(self) -> None:
+    def extrapolate_values(self, backwards=False) -> None:
         reversed_differences = reversed(self.differences)
         extrapolated_value = 0
+
+        if backwards:
+            extrapolate = self._backward_extrapolate
+        else:
+            extrapolate = self._forward_extrapolate
 
         for i, difference in enumerate(reversed_differences):
             if i == 0:
                 difference.append(extrapolated_value)
             else:
-                extrapolated_value = difference[-1] + extrapolated_value
-                difference.append(extrapolated_value)
+                extrapolated_value = extrapolate(difference, extrapolated_value)
 
-        self.differences = reversed(list(reversed_differences))
+        self.differences = list(reversed(list(reversed_differences)))
         self.extrapolated_value = extrapolated_value
+
+    def _forward_extrapolate(self, difference, extrapolated_value):
+        extrapolated_value = difference[-1] + extrapolated_value
+        difference.append(extrapolated_value)
+        return extrapolated_value
+
+    def _backward_extrapolate(self, difference, extrapolated_value):
+        extrapolated_value = difference[0] - extrapolated_value
+        difference.insert(0, extrapolated_value)
+        return extrapolated_value
 
 
 def part_1() -> int:
+    return extrapolate_reports()
+
+
+def part_2() -> int:
+    return extrapolate_reports(backwards=True)
+
+
+def extrapolate_reports(backwards=False) -> int:
     with open('input') as f:
         lines: list[str] = f.readlines()
 
@@ -53,7 +75,7 @@ def part_1() -> int:
     for report in report_lines:
         report = Report(report)
         report.calculate_differences()
-        report.extrapolate_values()
+        report.extrapolate_values(backwards=backwards)
         reports.append(report)
 
     return sum(report.extrapolated_value for report in reports)
@@ -61,3 +83,4 @@ def part_1() -> int:
 
 if __name__ == '__main__':
     print(part_1())
+    print(part_2())
